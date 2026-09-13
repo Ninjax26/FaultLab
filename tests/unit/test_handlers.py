@@ -22,3 +22,9 @@ async def test_sleep_handler_rejects_unbounded_sleep() -> None:
 def test_unknown_handler_is_explicit() -> None:
     with pytest.raises(UnknownJobKindError, match="not-registered"):
         get_handler("not-registered")
+
+
+def test_registered_kinds_match_handler_table() -> None:
+    from faultlab.worker.handlers import HANDLERS, registered_kinds
+
+    assert registered_kinds() == frozenset(HANDLERS)

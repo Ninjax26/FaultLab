@@ -17,6 +17,8 @@ from faultlab.repositories.jobs import (
 from faultlab.schemas.jobs import (
     CreateJobRequest,
     CreateJobResponse,
+    JobAttemptListResponse,
+    JobAttemptResponse,
     JobListResponse,
     JobResponse,
 )
@@ -86,6 +88,20 @@ async def get_job(
     except JobNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     return JobResponse.model_validate(job)
+
+
+@router.get("/{job_id}/attempts", response_model=JobAttemptListResponse)
+async def list_job_attempts(
+    job_id: uuid.UUID,
+    session: SessionDependency,
+) -> JobAttemptListResponse:
+    try:
+        attempts = await repository(session).list_attempts(job_id)
+    except JobNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return JobAttemptListResponse(
+        items=[JobAttemptResponse.model_validate(attempt) for attempt in attempts]
+    )
 
 
 @router.post("/{job_id}/cancel", response_model=JobResponse)

@@ -34,7 +34,10 @@ async def async_main() -> None:
     for signal_name in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(signal_name, worker.stop)
 
-    await worker.run()
+    try:
+        await worker.run()
+    finally:
+        await engine.dispose()
 
 
 def main() -> None:

@@ -167,6 +167,16 @@ func (w *worker) renew(ctx context.Context, id string) (valid, cancel bool, err 
 	return err == nil, cancel, err
 }
 
+func (w *worker) observe(ctx context.Context, id string) (valid, cancel bool, err error) {
+	err = w.pool.QueryRow(ctx, `SELECT cancellation_requested_at IS NOT NULL FROM jobs
+		WHERE id=$1::uuid AND status='running' AND lease_owner=$2
+		AND lease_expires_at > now()`, id, w.id).Scan(&cancel)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return false, false, nil
+	}
+	return err == nil, cancel, err
+}
+
 func (w *worker) finish(ctx context.Context, j *job, outcome string, result map[string]any, handlerErr error) error {
 	tx, err := w.pool.Begin(ctx)
 	if err != nil {
@@ -328,23 +338,43 @@ func (w *worker) execute(ctx context.Context, j *job) error {
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		ticker := time.NewTicker(w.heartbeat)
+		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
+		lastRenew := time.Now()
+		check := func(renew bool) bool {
+			var valid, requested bool
+			var err error
+			if renew {
+				valid, requested, err = w.renew(ctx, j.id)
+			} else {
+				valid, requested, err = w.observe(ctx, j.id)
+			}
+			if err != nil || !valid {
+				state <- "lost"
+				cancel()
+				return false
+			}
+			if requested {
+				state <- "cancel"
+				cancel()
+				return false
+			}
+			return true
+		}
+		if !check(false) {
+			return
+		}
 		for {
 			select {
 			case <-handlerCtx.Done():
 				return
 			case <-ticker.C:
-				valid, requested, err := w.renew(ctx, j.id)
-				if err != nil || !valid {
-					state <- "lost"
-					cancel()
+				renew := time.Since(lastRenew) >= w.heartbeat
+				if !check(renew) {
 					return
 				}
-				if requested {
-					state <- "cancel"
-					cancel()
-					return
+				if renew {
+					lastRenew = time.Now()
 				}
 			}
 		}

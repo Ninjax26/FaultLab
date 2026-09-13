@@ -133,6 +133,15 @@ class JobRepository:
             raise JobNotFoundError(f"job {job_id} was not found")
         return job
 
+    async def list_attempts(self, job_id: uuid.UUID) -> list[JobAttempt]:
+        await self.get_job(job_id)
+        statement = (
+            select(JobAttempt)
+            .where(JobAttempt.job_id == job_id)
+            .order_by(JobAttempt.attempt_number.asc())
+        )
+        return list((await self._session.scalars(statement)).all())
+
     async def list_jobs(
         self,
         *,
@@ -275,6 +284,29 @@ class JobRepository:
                 updated_at=now,
             )
             .returning(Job.cancellation_requested_at)
+        )
+        row = result.one_or_none()
+        return HeartbeatState(
+            lease_valid=row is not None,
+            cancellation_requested=row is not None and row[0] is not None,
+        )
+
+    async def observe_lease(
+        self,
+        *,
+        job_id: uuid.UUID,
+        worker_id: str,
+    ) -> HeartbeatState:
+        """Read lease ownership and cancellation without extending the lease."""
+
+        now = datetime.now(UTC)
+        result = await self._session.execute(
+            select(Job.cancellation_requested_at).where(
+                Job.id == job_id,
+                Job.status == JobStatus.RUNNING.value,
+                Job.lease_owner == worker_id,
+                Job.lease_expires_at > now,
+            )
         )
         row = result.one_or_none()
         return HeartbeatState(

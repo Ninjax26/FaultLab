@@ -69,3 +69,21 @@ async def test_concurrent_workers_claim_different_jobs(
 
     assert None not in claimed
     assert len(set(claimed)) == 5
+
+
+async def test_list_attempts_returns_the_claim_row(
+    sessions: async_sessionmaker[AsyncSession],
+) -> None:
+    async with sessions() as session, session.begin():
+        created = await JobRepository(session).create_job(command(key="attempt-history"))
+
+    async with sessions() as session, session.begin():
+        repo = JobRepository(session)
+        job = await repo.claim_next(queue="default", worker_id="worker-1", lease_seconds=30)
+        assert job is not None
+        assert job.id == created.job.id
+        attempts = await repo.list_attempts(job.id)
+
+    assert len(attempts) == 1
+    assert attempts[0].attempt_number == 1
+    assert attempts[0].worker_id == "worker-1"

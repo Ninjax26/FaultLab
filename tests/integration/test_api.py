@@ -1,4 +1,5 @@
 from collections.abc import AsyncIterator
+from uuid import uuid4
 
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -43,6 +44,15 @@ async def test_http_submission_idempotency_and_cancellation(
             assert listed.status_code == 200
             assert len(listed.json()["items"]) == 1
             assert (await client.get(f"/v1/jobs/{job_id}")).status_code == 200
+
+            attempts = await client.get(f"/v1/jobs/{job_id}/attempts")
+            assert attempts.status_code == 200
+            assert attempts.json()["items"] == []
+            missing = await client.get(f"/v1/jobs/{uuid4()}/attempts")
+            assert missing.status_code == 404
+
+            unknown = await client.post("/v1/jobs", json={"kind": "not-registered", "payload": {}})
+            assert unknown.status_code == 422
 
             cancelled = await client.post(f"/v1/jobs/{job_id}/cancel")
             assert cancelled.status_code == 200

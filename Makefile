@@ -28,7 +28,8 @@ format:
 
 check:
 	uv run --no-editable ruff check .
-	uv run --no-editable mypy
+	uv run --no-editable ruff format --check .
+	uv run --no-editable mypy src
 	uv run --no-editable pytest
 
 compose-up:

@@ -1,5 +1,8 @@
 # FaultLab
 
+[![CI](https://github.com/Ninjax26/FaultLab/actions/workflows/ci.yml/badge.svg)](https://github.com/Ninjax26/FaultLab/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 FaultLab is a PostgreSQL-backed distributed job runner built to make reliability mechanics
 visible. A FastAPI control plane accepts jobs; independent Python or Go worker processes claim,
 execute, retry, cancel, and recover them. This is a portfolio-grade systems project and a local
@@ -25,8 +28,9 @@ HTTP client -> FastAPI -> PostgreSQL jobs + attempts + business effects
 - Cooperative running-job cancellation; queued cancellation is immediate. A handler that ignores
   cancellation can still finish successfully, by design.
 - Python and Go workers that share the same job/attempt schema and lease protocol.
-- FastAPI status/cancellation endpoints, Prometheus metrics, optional OTLP tracing, Alembic
-  migrations, Docker Compose, unit/integration tests, and GitHub Actions CI.
+- FastAPI status, cancellation, and attempt-history endpoints, Prometheus metrics, optional OTLP
+  tracing, Alembic migrations, Docker Compose, unit/integration tests, and GitHub Actions CI.
+- Submit-time validation so only registered handler kinds enter the queue.
 - Reproducible claim, end-to-end pipeline, and cross-runtime benchmarks under `reports/`.
 
 FaultLab guarantees **at-least-once execution**, not exactly-once arbitrary side effects.
@@ -73,10 +77,11 @@ curl -X POST http://localhost:8000/v1/jobs \
   -d '{"kind":"echo","payload":{"message":"hello"},"idempotency_key":"hello-001"}'
 ```
 
-The response contains a job ID. Inspect it with `GET /v1/jobs/{id}`. Submit a long-running
-`sleep` job and call `POST /v1/jobs/{id}/cancel` to observe cooperative cancellation.
+The response contains a job ID. Inspect it with `GET /v1/jobs/{id}` and its attempt history
+with `GET /v1/jobs/{id}/attempts`. Submit a long-running `sleep` job and call
+`POST /v1/jobs/{id}/cancel` to observe cooperative cancellation.
 Submit `record_once` with `{"business_key":"invoice-123","value":{"amount":42}}` to see
-the database-backed idempotent effect.
+the database-backed idempotent effect. Unknown `kind` values are rejected with HTTP 422.
 
 To run locally instead of Compose:
 

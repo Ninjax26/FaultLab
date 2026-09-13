@@ -4,7 +4,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from faultlab.domain.jobs import JobStatus
+from faultlab.domain.jobs import AttemptStatus, JobStatus
+from faultlab.worker.handlers import registered_kinds
 
 
 class CreateJobRequest(BaseModel):
@@ -15,6 +16,15 @@ class CreateJobRequest(BaseModel):
     max_attempts: int = Field(default=3, ge=1, le=20)
     run_at: datetime | None = None
     idempotency_key: str | None = Field(default=None, min_length=1, max_length=255)
+
+    @field_validator("kind")
+    @classmethod
+    def require_registered_kind(cls, value: str) -> str:
+        kinds = registered_kinds()
+        if value not in kinds:
+            allowed = ", ".join(sorted(kinds))
+            raise ValueError(f"unknown job kind '{value}'; registered kinds: {allowed}")
+        return value
 
     @field_validator("run_at")
     @classmethod
@@ -49,6 +59,23 @@ class JobResponse(BaseModel):
     updated_at: datetime
     started_at: datetime | None
     finished_at: datetime | None
+
+
+class JobAttemptResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    job_id: uuid.UUID
+    attempt_number: int
+    worker_id: str
+    status: AttemptStatus
+    error: str | None
+    started_at: datetime
+    finished_at: datetime | None
+
+
+class JobAttemptListResponse(BaseModel):
+    items: list[JobAttemptResponse]
 
 
 class CreateJobResponse(BaseModel):

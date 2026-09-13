@@ -138,25 +138,36 @@ class Worker:
                 )
 
     async def _heartbeat(self, job_id: uuid.UUID, cancellation_event: asyncio.Event) -> None:
+        poll = min(1.0, float(self._settings.worker_heartbeat_seconds))
+        last_renew = time.monotonic()
         while True:
-            await asyncio.sleep(self._settings.worker_heartbeat_seconds)
             try:
                 async with self._session_factory() as session, session.begin():
-                    renewed = await self._repository(session).heartbeat(
-                        job_id=job_id,
-                        worker_id=self._worker_id,
-                        lease_seconds=self._settings.worker_lease_seconds,
-                    )
+                    repo = self._repository(session)
+                    now = time.monotonic()
+                    if now - last_renew >= self._settings.worker_heartbeat_seconds:
+                        state = await repo.heartbeat(
+                            job_id=job_id,
+                            worker_id=self._worker_id,
+                            lease_seconds=self._settings.worker_lease_seconds,
+                        )
+                        last_renew = now
+                    else:
+                        state = await repo.observe_lease(
+                            job_id=job_id,
+                            worker_id=self._worker_id,
+                        )
             except Exception:
                 logger.exception("heartbeat failed; handler should stop at its next safe point")
                 cancellation_event.set()
                 return
-            if not renewed.lease_valid:
+            if not state.lease_valid:
                 logger.error("lost lease while heartbeating job_id=%s", job_id)
                 cancellation_event.set()
                 return
-            if renewed.cancellation_requested:
+            if state.cancellation_requested:
                 cancellation_event.set()
+            await asyncio.sleep(poll)
 
     async def _record_effect(self, business_key: str, value: dict[str, object]) -> bool:
         async with self._session_factory() as session, session.begin():

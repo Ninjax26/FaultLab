@@ -50,6 +50,19 @@ services:
       FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT: ${FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT:-}
     ports:
       - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=2)",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -63,6 +76,7 @@ services:
       FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT: ${FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT:-}
     ports:
       - "9100:9100"
+    restart: unless-stopped
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -75,8 +89,10 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - api
-      - worker
+      api:
+        condition: service_healthy
+      worker:
+        condition: service_started
 
 volumes:
   faultlab-postgres:

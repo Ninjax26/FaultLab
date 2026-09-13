@@ -103,6 +103,10 @@ HANDLERS: dict[str, JobHandler] = {
 }
 
 
+def registered_kinds() -> frozenset[str]:
+    return frozenset(HANDLERS)
+
+
 def get_handler(kind: str) -> JobHandler:
     try:
         return HANDLERS[kind]
