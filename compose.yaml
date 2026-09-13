@@ -1,0 +1,82 @@
+name: faultlab
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: faultlab
+      POSTGRES_USER: faultlab
+      POSTGRES_PASSWORD: faultlab
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U faultlab -d faultlab"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - faultlab-postgres:/var/lib/postgresql/data
+
+  postgres-test:
+    image: postgres:17-alpine
+    profiles: ["test"]
+    environment:
+      POSTGRES_DB: faultlab_test
+      POSTGRES_USER: faultlab
+      POSTGRES_PASSWORD: faultlab
+    ports:
+      - "55433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U faultlab -d faultlab_test"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      FAULTLAB_DATABASE_URL: postgresql+asyncpg://faultlab:faultlab@postgres:5432/faultlab
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: .
+    environment:
+      FAULTLAB_DATABASE_URL: postgresql+asyncpg://faultlab:faultlab@postgres:5432/faultlab
+      FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT: ${FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    build: .
+    command: ["python", "-m", "faultlab.worker.main"]
+    environment:
+      FAULTLAB_DATABASE_URL: postgresql+asyncpg://faultlab:faultlab@postgres:5432/faultlab
+      FAULTLAB_WORKER_METRICS_PORT: 9100
+      FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT: ${FAULTLAB_OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    ports:
+      - "9100:9100"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    volumes:
+      - ./ops/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+      - worker
+
+volumes:
+  faultlab-postgres:

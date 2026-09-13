@@ -1,0 +1,469 @@
+{
+  "generated_at": "2026-09-13T19:21:44.088943+00:00",
+  "database_url_redacted": "postgresql+asyncpg://***:***@127.0.0.1:55433/faultlab_test",
+  "environment": {
+    "python_version": "3.12.13",
+    "operating_system": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "logical_cpu_count": 10,
+    "postgres_version": "PostgreSQL 17.11 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "postgres_max_connections": "100",
+    "postgres_shared_buffers": "128MB",
+    "postgres_work_mem": "4MB"
+  },
+  "runs": [
+    {
+      "queue": "pipeline-aa4be2a7ee",
+      "generated_at": "2026-09-13T19:21:41.242979+00:00",
+      "jobs": 200,
+      "workers": 1,
+      "pool_size": 12,
+      "payload": "benchmark-noop, JSON {sequence: integer}, zero handler sleep",
+      "enqueue_mode": "one PostgreSQL transaction, batched INSERTs of 500 rows",
+      "enqueue_seconds": 0.044,
+      "enqueue_jobs_per_second": 4508.39,
+      "backlog_drain_seconds": 1.514,
+      "completion_jobs_per_second": 132.07,
+      "end_to_end_latency_ms": {
+        "mean": 813.501,
+        "p50": 817.158,
+        "p95": 1429.296,
+        "p99": 1491.541,
+        "maximum": 1510.56
+      },
+      "status_counts": {
+        "pending": 0,
+        "running": 0,
+        "retry_pending": 0,
+        "succeeded": 200,
+        "dead": 0,
+        "cancelled": 0
+      },
+      "lost_jobs": 0,
+      "max_database_connections": 2,
+      "process_cpu_seconds": 0.764,
+      "process_peak_rss_mib": 82.52,
+      "database_stat_deltas": {
+        "xact_commit": 377,
+        "blks_read": 21,
+        "blks_hit": 11935,
+        "tup_inserted": 324,
+        "tup_updated": 374
+      },
+      "backlog_samples": [
+        [
+          0.031,
+          200
+        ],
+        [
+          0.088,
+          197
+        ],
+        [
+          0.14,
+          191
+        ],
+        [
+          0.196,
+          184
+        ],
+        [
+          0.248,
+          176
+        ],
+        [
+          0.303,
+          170
+        ],
+        [
+          0.355,
+          164
+        ],
+        [
+          0.407,
+          157
+        ],
+        [
+          0.46,
+          149
+        ],
+        [
+          0.513,
+          141
+        ],
+        [
+          0.565,
+          135
+        ],
+        [
+          0.617,
+          127
+        ],
+        [
+          0.67,
+          120
+        ],
+        [
+          0.722,
+          112
+        ],
+        [
+          0.775,
+          104
+        ],
+        [
+          0.827,
+          97
+        ],
+        [
+          0.881,
+          92
+        ],
+        [
+          0.933,
+          85
+        ],
+        [
+          0.985,
+          77
+        ],
+        [
+          1.038,
+          68
+        ],
+        [
+          1.09,
+          59
+        ],
+        [
+          1.142,
+          51
+        ],
+        [
+          1.194,
+          43
+        ],
+        [
+          1.247,
+          35
+        ],
+        [
+          1.299,
+          27
+        ],
+        [
+          1.353,
+          18
+        ],
+        [
+          1.409,
+          11
+        ],
+        [
+          1.461,
+          5
+        ],
+        [
+          1.514,
+          0
+        ]
+      ],
+      "timed_out": false
+    },
+    {
+      "queue": "pipeline-690e150456",
+      "generated_at": "2026-09-13T19:21:42.205543+00:00",
+      "jobs": 200,
+      "workers": 2,
+      "pool_size": 12,
+      "payload": "benchmark-noop, JSON {sequence: integer}, zero handler sleep",
+      "enqueue_mode": "one PostgreSQL transaction, batched INSERTs of 500 rows",
+      "enqueue_seconds": 0.037,
+      "enqueue_jobs_per_second": 5417.31,
+      "backlog_drain_seconds": 0.885,
+      "completion_jobs_per_second": 226.05,
+      "end_to_end_latency_ms": {
+        "mean": 478.652,
+        "p50": 477.351,
+        "p95": 819.819,
+        "p99": 851.673,
+        "maximum": 860.545
+      },
+      "status_counts": {
+        "pending": 0,
+        "running": 0,
+        "retry_pending": 0,
+        "succeeded": 200,
+        "dead": 0,
+        "cancelled": 0
+      },
+      "lost_jobs": 0,
+      "max_database_connections": 3,
+      "process_cpu_seconds": 0.693,
+      "process_peak_rss_mib": 82.52,
+      "database_stat_deltas": {
+        "xact_commit": 3,
+        "blks_read": 0,
+        "blks_hit": 96,
+        "tup_inserted": 0,
+        "tup_updated": 0
+      },
+      "backlog_samples": [
+        [
+          0.039,
+          200
+        ],
+        [
+          0.092,
+          191
+        ],
+        [
+          0.189,
+          176
+        ],
+        [
+          0.242,
+          161
+        ],
+        [
+          0.295,
+          146
+        ],
+        [
+          0.35,
+          134
+        ],
+        [
+          0.403,
+          118
+        ],
+        [
+          0.456,
+          104
+        ],
+        [
+          0.512,
+          90
+        ],
+        [
+          0.566,
+          78
+        ],
+        [
+          0.62,
+          64
+        ],
+        [
+          0.673,
+          48
+        ],
+        [
+          0.725,
+          34
+        ],
+        [
+          0.778,
+          19
+        ],
+        [
+          0.832,
+          6
+        ],
+        [
+          0.885,
+          0
+        ]
+      ],
+      "timed_out": false
+    },
+    {
+      "queue": "pipeline-10e1fcce36",
+      "generated_at": "2026-09-13T19:21:43.029955+00:00",
+      "jobs": 200,
+      "workers": 4,
+      "pool_size": 12,
+      "payload": "benchmark-noop, JSON {sequence: integer}, zero handler sleep",
+      "enqueue_mode": "one PostgreSQL transaction, batched INSERTs of 500 rows",
+      "enqueue_seconds": 0.037,
+      "enqueue_jobs_per_second": 5391.79,
+      "backlog_drain_seconds": 0.741,
+      "completion_jobs_per_second": 270.08,
+      "end_to_end_latency_ms": {
+        "mean": 394.741,
+        "p50": 394.399,
+        "p95": 663.933,
+        "p99": 690.432,
+        "maximum": 692.446
+      },
+      "status_counts": {
+        "pending": 0,
+        "running": 0,
+        "retry_pending": 0,
+        "succeeded": 200,
+        "dead": 0,
+        "cancelled": 0
+      },
+      "lost_jobs": 0,
+      "max_database_connections": 5,
+      "process_cpu_seconds": 0.677,
+      "process_peak_rss_mib": 82.52,
+      "database_stat_deltas": {
+        "xact_commit": 5,
+        "blks_read": 0,
+        "blks_hit": 160,
+        "tup_inserted": 0,
+        "tup_updated": 0
+      },
+      "backlog_samples": [
+        [
+          0.074,
+          200
+        ],
+        [
+          0.128,
+          188
+        ],
+        [
+          0.182,
+          169
+        ],
+        [
+          0.241,
+          151
+        ],
+        [
+          0.296,
+          130
+        ],
+        [
+          0.35,
+          112
+        ],
+        [
+          0.405,
+          96
+        ],
+        [
+          0.459,
+          76
+        ],
+        [
+          0.517,
+          57
+        ],
+        [
+          0.574,
+          37
+        ],
+        [
+          0.629,
+          20
+        ],
+        [
+          0.684,
+          3
+        ],
+        [
+          0.741,
+          0
+        ]
+      ],
+      "timed_out": false
+    },
+    {
+      "queue": "pipeline-7d0e442607",
+      "generated_at": "2026-09-13T19:21:44.059821+00:00",
+      "jobs": 200,
+      "workers": 8,
+      "pool_size": 12,
+      "payload": "benchmark-noop, JSON {sequence: integer}, zero handler sleep",
+      "enqueue_mode": "one PostgreSQL transaction, batched INSERTs of 500 rows",
+      "enqueue_seconds": 0.037,
+      "enqueue_jobs_per_second": 5477.74,
+      "backlog_drain_seconds": 0.916,
+      "completion_jobs_per_second": 218.33,
+      "end_to_end_latency_ms": {
+        "mean": 481.842,
+        "p50": 462.972,
+        "p95": 846.249,
+        "p99": 879.419,
+        "maximum": 891.476
+      },
+      "status_counts": {
+        "pending": 0,
+        "running": 0,
+        "retry_pending": 0,
+        "succeeded": 200,
+        "dead": 0,
+        "cancelled": 0
+      },
+      "lost_jobs": 0,
+      "max_database_connections": 9,
+      "process_cpu_seconds": 0.898,
+      "process_peak_rss_mib": 82.52,
+      "database_stat_deltas": {
+        "xact_commit": 9,
+        "blks_read": 0,
+        "blks_hit": 288,
+        "tup_inserted": 0,
+        "tup_updated": 0
+      },
+      "backlog_samples": [
+        [
+          0.143,
+          200
+        ],
+        [
+          0.204,
+          186
+        ],
+        [
+          0.265,
+          166
+        ],
+        [
+          0.329,
+          144
+        ],
+        [
+          0.387,
+          126
+        ],
+        [
+          0.447,
+          104
+        ],
+        [
+          0.509,
+          83
+        ],
+        [
+          0.573,
+          64
+        ],
+        [
+          0.655,
+          46
+        ],
+        [
+          0.722,
+          38
+        ],
+        [
+          0.791,
+          24
+        ],
+        [
+          0.85,
+          9
+        ],
+        [
+          0.916,
+          0
+        ]
+      ],
+      "timed_out": false
+    }
+  ]
+}
