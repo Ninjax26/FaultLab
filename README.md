@@ -46,6 +46,9 @@ for the crash and cancellation boundaries.
 - [Stage 6 runtime report](reports/stage6-runtimes.md): three repetitions per configuration,
   200 jobs per run, Python and Go *processes* on identical no-op jobs. The report gives medians
   and ranges; this trivial workload is not representative of real business handlers.
+- [Connection-pressure report](reports/stage6-connections.md): each worker encountered a
+  disposable PostgreSQL instance with all 100 connection slots held, then completed 10 jobs
+  after those slots were released, with no lost jobs in this short experiment.
 
 On this machine the repeated 2-worker no-op comparison measured median completion rates of
 116.65 jobs/s (Python) and 344.62 jobs/s (Go), with median sampled worker RSS of 155.52 MiB
@@ -108,6 +111,7 @@ make test-integration
 make go-test
 make stage5-benchmark
 make stage6-benchmark
+make stage6-pressure
 ```
 
 The integration/benchmark database is a disposable `postgres-test` Compose service on host

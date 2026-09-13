@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-09-13T19:54:25.555541+00:00",
+  "database_url_redacted": "postgresql+asyncpg://***:***@127.0.0.1:55433/faultlab_test",
+  "warning": "Disposable local DB only. All connection slots are intentionally exhausted for 2-5s.",
+  "runs": [
+    {
+      "runtime": "python",
+      "jobs": 10,
+      "postgres_max_connections": 100,
+      "held_connections": 100,
+      "held_seconds": 2.018,
+      "saturation_error": "TooManyConnectionsError: sorry, too many clients already",
+      "worker_failure_log_lines_before_release": 19,
+      "worker_connection_error_lines": 19,
+      "release_to_complete_seconds": 0.357,
+      "completed": 10,
+      "lost": 0
+    },
+    {
+      "runtime": "go",
+      "jobs": 10,
+      "postgres_max_connections": 100,
+      "held_connections": 100,
+      "held_seconds": 2.223,
+      "saturation_error": "TooManyConnectionsError: sorry, too many clients already",
+      "worker_failure_log_lines_before_release": 2,
+      "worker_connection_error_lines": 3,
+      "release_to_complete_seconds": 0.298,
+      "completed": 10,
+      "lost": 0
+    }
+  ]
+}

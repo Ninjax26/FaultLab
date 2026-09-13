@@ -1,4 +1,4 @@
-.PHONY: install run-api run-worker migrate test test-integration lint format check compose-up compose-down stage1-db stage1-benchmark benchmark-db stage5-benchmark go-test go-build stage6-benchmark
+.PHONY: install run-api run-worker migrate test test-integration lint format check compose-up compose-down stage1-db stage1-benchmark benchmark-db stage5-benchmark go-test go-build stage6-benchmark stage6-pressure
 
 install:
 	uv sync --no-editable
@@ -59,3 +59,6 @@ go-build:
 
 stage6-benchmark: benchmark-db go-build
 	TEST_DATABASE_URL=postgresql+asyncpg://faultlab:faultlab@localhost:55433/faultlab_test PYTHONPATH=src uv run --no-editable python scripts/benchmark_runtimes.py --go-binary go-worker/faultlab-go-worker
+
+stage6-pressure: benchmark-db go-build
+	TEST_DATABASE_URL=postgresql+asyncpg://faultlab:faultlab@localhost:55433/faultlab_test PYTHONPATH=src uv run --no-editable python scripts/benchmark_connection_pressure.py --go-binary go-worker/faultlab-go-worker

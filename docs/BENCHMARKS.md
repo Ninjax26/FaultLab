@@ -34,9 +34,12 @@ pool in this comparison; Python uses SQLAlchemy's configured pool. The Python/Go
 not normalized for connection-pool size or runtime instrumentation. They are evidence for
 this workload only. Go and Python mixed-queue recovery is separately tested in CI.
 
-The benchmark does **not** intentionally exhaust PostgreSQL's global `max_connections`,
-does not simulate multi-region latency, and does not measure sustained production capacity.
-These are useful next experiments, not claims the project has already proven.
+`scripts/benchmark_connection_pressure.py` separately holds every available connection on
+the disposable local PostgreSQL instance for at least two seconds. Both runtimes logged
+failed database attempts, then completed all 10 queued jobs after slots were released;
+see the [connection-pressure report](../reports/stage6-connections.md). This is a brief
+recovery check, not sustained-load capacity. The benchmarks do not simulate multi-region
+latency or measure PostgreSQL CPU/memory directly.
 
 ## Commands
 
@@ -44,6 +47,7 @@ These are useful next experiments, not claims the project has already proven.
 make test-integration
 make stage5-benchmark
 make stage6-benchmark
+make stage6-pressure
 ```
 
 Reports are in `reports/`. Never place a raw database password or a throughput number without

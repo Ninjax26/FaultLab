@@ -106,6 +106,43 @@ async def test_go_and_python_share_queue_protocol(
             created = await JobRepository(session).create_job(
                 CreateJobCommand(
                     queue=queue,
+                    kind="sleep_uncooperative",
+                    payload={"seconds": 1.5},
+                    priority=0,
+                    max_attempts=3,
+                    run_at=datetime.now(UTC),
+                    idempotency_key=None,
+                )
+            )
+            ignored_id = created.job.id
+        await wait_for_status(sessions, ignored_id, JobStatus.RUNNING)
+        async with sessions() as session, session.begin():
+            await JobRepository(session).cancel_job(ignored_id)
+        ignored = await wait_for_status(sessions, ignored_id, JobStatus.SUCCEEDED)
+        assert ignored.cancellation_requested_at is not None
+
+        async with sessions() as session, session.begin():
+            created = await JobRepository(session).create_job(
+                CreateJobCommand(
+                    queue=queue,
+                    kind="sleep",
+                    payload={"seconds": 3},
+                    priority=0,
+                    max_attempts=3,
+                    run_at=datetime.now(UTC),
+                    idempotency_key=None,
+                )
+            )
+            cooperative_id = created.job.id
+        await wait_for_status(sessions, cooperative_id, JobStatus.RUNNING)
+        async with sessions() as session, session.begin():
+            await JobRepository(session).cancel_job(cooperative_id)
+        await wait_for_status(sessions, cooperative_id, JobStatus.CANCELLED)
+
+        async with sessions() as session, session.begin():
+            created = await JobRepository(session).create_job(
+                CreateJobCommand(
+                    queue=queue,
                     kind="sleep",
                     payload={"seconds": 10},
                     priority=0,

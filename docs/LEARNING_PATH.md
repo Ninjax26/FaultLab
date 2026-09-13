@@ -1,10 +1,10 @@
 # FaultLab learning path
 
 The repository now contains implementations and evidence for Stages 1-6. The Stage 5 and 6
-reports are local experiments, not production capacity claims. The Stage 6 global
-PostgreSQL-connection-exhaustion experiment and the optional advanced work are not complete;
-see [BENCHMARKS.md](BENCHMARKS.md). Stage 0 and the interview checklist still require the
-project owner to explain the design independently; code cannot certify understanding.
+reports are local experiments, not production capacity claims. Connection exhaustion was
+tested only as a short disposable-database recovery experiment; optional advanced work is
+not complete. See [BENCHMARKS.md](BENCHMARKS.md). Stage 0 and the interview checklist still
+require the project owner to explain the design independently; code cannot certify understanding.
 
 Build one stage at a time. After each stage, explain the request flow without reading the code
 and deliberately test the associated failure.
@@ -109,9 +109,9 @@ Never publish a throughput number without this context.
 
 ## Stage 6: Go worker, only after understanding the Python worker
 
-Go worker implemented under `go-worker/`, with shared-queue integration tests and a
-[repeated comparison](../reports/stage6-runtimes.md). Global PostgreSQL connection
-exhaustion has not been tested.
+Go worker implemented under `go-worker/`, with shared-queue integration tests, a
+[repeated comparison](../reports/stage6-runtimes.md), and a
+[short connection-exhaustion recovery experiment](../reports/stage6-connections.md).
 
 Port one worker implementation to Go while preserving the database protocol and invariants.
 Run Python and Go workers against the same queue and compare:
