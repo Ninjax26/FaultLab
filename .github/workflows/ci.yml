@@ -40,7 +40,7 @@ jobs:
         with:
           go-version-file: go-worker/go.mod
           cache-dependency-path: go-worker/go.sum
-      - uses: astral-sh/setup-uv@v10.0.1
+      - uses: astral-sh/setup-uv@v10.1.0
       - name: Install locked Python dependencies
         run: uv sync --frozen --no-editable
       - name: Python lint and type check
