@@ -71,6 +71,11 @@ docker compose up --build
 
 Open [API docs](http://localhost:8000/docs) or [Prometheus](http://localhost:9090).
 
+For a self-checking walkthrough of retries, idempotency, cancellation, and the visible job
+history, run `uv sync --no-editable` and then
+`uv run --no-editable python scripts/showcase.py`. See the
+[five-minute showcase guide](docs/SHOWCASE.md) for what to say and which screens to show.
+
 ```bash
 curl -X POST http://localhost:8000/v1/jobs \
   -H 'Content-Type: application/json' \
