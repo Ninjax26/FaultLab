@@ -1,7 +1,10 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from prometheus_client import make_asgi_app
 
 from faultlab.api.routes import health, jobs
@@ -28,6 +31,16 @@ app = FastAPI(
 app.include_router(health.router)
 app.include_router(jobs.router)
 app.mount("/metrics", make_asgi_app())
+
+dashboard_dir = Path(__file__).resolve().parent / "static"
+app.mount("/dashboard/assets", StaticFiles(directory=dashboard_dir), name="dashboard-assets")
+
+
+@app.get("/dashboard", include_in_schema=False)
+@app.get("/dashboard/", include_in_schema=False)
+async def dashboard() -> FileResponse:
+    return FileResponse(dashboard_dir / "index.html")
+
 
 configure_tracing(
     settings=settings,

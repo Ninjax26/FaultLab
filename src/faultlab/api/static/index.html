@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#15252e" />
+    <title>FaultLab — Job console</title>
+    <meta name="description" content="Local operations console for FaultLab background jobs." />
+    <link rel="stylesheet" href="/dashboard/assets/dashboard.css" />
+    <script src="/dashboard/assets/dashboard.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to job console</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="/dashboard" aria-label="FaultLab job console home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>Fault<span class="brand-accent">Lab</span></span>
+        </a>
+        <nav class="header-links" aria-label="Project links">
+          <a class="current" href="/dashboard" aria-current="page">Console</a>
+          <a href="/docs">API docs</a>
+          <a href="http://localhost:9090" target="_blank" rel="noopener noreferrer">Prometheus <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/Ninjax26/FaultLab" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">LOCAL OPERATIONS / DEFAULT QUEUE</p>
+          <h1 id="page-title">Job console</h1>
+          <p class="intro-copy">Watch work move through the queue, inspect every attempt, and run a controlled failure demo.</p>
+        </div>
+        <div class="connection" id="connection" role="status" aria-live="polite">
+          <span class="connection-dot" aria-hidden="true"></span>
+          <span id="connection-label">Connecting to API</span>
+        </div>
+      </section>
+
+      <section class="summary" aria-label="Status among the latest 200 jobs">
+        <div class="summary-cell">
+          <span class="summary-label">Pending</span>
+          <strong id="count-pending">—</strong>
+          <span class="summary-caption">Waiting to be claimed</span>
+        </div>
+        <div class="summary-cell">
+          <span class="summary-label">Running</span>
+          <strong id="count-running">—</strong>
+          <span class="summary-caption">Worker has a lease</span>
+        </div>
+        <div class="summary-cell">
+          <span class="summary-label">Succeeded</span>
+          <strong id="count-succeeded">—</strong>
+          <span class="summary-caption">Finished successfully</span>
+        </div>
+        <div class="summary-cell attention-cell">
+          <span class="summary-label">Retrying / dead</span>
+          <strong id="count-attention">—</strong>
+          <span class="summary-caption">Waiting or exhausted</span>
+        </div>
+        <div class="summary-cell">
+          <span class="summary-label">Cancelled</span>
+          <strong id="count-cancelled">—</strong>
+          <span class="summary-caption">Stopped by request</span>
+        </div>
+      </section>
+      <p class="scope-note">Counts reflect the latest 200 jobs returned by the API, not all historical jobs.</p>
+
+      <section class="workbench" aria-label="Operate and inspect jobs">
+        <div class="left-stack">
+          <section class="panel create-panel" aria-labelledby="create-title">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">RUN AN EXPERIMENT</p>
+                <h2 id="create-title">Create a demo job</h2>
+              </div>
+              <span class="local-tag">Safe local handlers</span>
+            </div>
+            <form id="create-form" class="create-form">
+              <div class="field">
+                <label for="preset">Scenario</label>
+                <select id="preset" name="preset">
+                  <option value="echo">Echo · normal completion</option>
+                  <option value="flaky">Flaky · fail once, then retry</option>
+                  <option value="sleep">Sleep · cancel while running</option>
+                  <option value="record_once">Record once · idempotent effect</option>
+                </select>
+              </div>
+              <button id="create-button" class="button button-primary" type="submit">Create job <span aria-hidden="true">→</span></button>
+            </form>
+            <p id="preset-description" class="form-hint">Returns your message after a worker claims the job.</p>
+          </section>
+
+          <section class="panel jobs-panel" aria-labelledby="jobs-title">
+            <div class="panel-heading jobs-heading">
+              <div>
+                <p class="section-kicker">QUEUE ACTIVITY</p>
+                <h2 id="jobs-title">Recent jobs <span id="list-count" class="heading-count"></span></h2>
+              </div>
+              <button id="refresh-button" class="button button-secondary" type="button">Refresh</button>
+            </div>
+            <div class="filter-bar">
+              <label for="status-filter">Show</label>
+              <select id="status-filter" name="status-filter">
+                <option value="all">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="running">Running</option>
+                <option value="retry_pending">Retry pending</option>
+                <option value="succeeded">Succeeded</option>
+                <option value="dead">Dead</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <span id="last-updated" class="last-updated">Waiting for first update</span>
+            </div>
+            <div id="job-list" class="job-list" aria-live="off">
+              <p class="list-message">Loading jobs…</p>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel detail-panel" aria-labelledby="detail-title">
+          <div class="panel-heading detail-heading">
+            <div>
+              <p class="section-kicker">JOB INSPECTOR</p>
+              <h2 id="detail-title" tabindex="-1">Details &amp; attempts</h2>
+            </div>
+          </div>
+          <div id="job-detail" class="job-detail">
+            <div class="detail-empty">
+              <span class="empty-symbol" aria-hidden="true">↗</span>
+              <h3>Select a job</h3>
+              <p>Choose a row to see its payload, result, lease information, and complete attempt history.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="site-footer">
+        <p>FaultLab is a local learning lab. It is not an authenticated production console.</p>
+        <a href="https://github.com/Ninjax26/FaultLab/blob/main/docs/RELIABILITY.md" target="_blank" rel="noopener noreferrer">Read the reliability model <span aria-hidden="true">↗</span></a>
+      </footer>
+    </main>
+    <div id="announcement" class="announcement" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -23,6 +23,11 @@ uv sync --no-editable
 uv run --no-editable python scripts/showcase.py
 ```
 
+Open the [job console](http://localhost:8000/dashboard) alongside the terminal. It presents
+the latest 200 jobs with status counts, a filter, and a detail/attempt inspector. You can also
+create the same safe demo scenarios there without running the script. For a beginner explanation
+and interview questions, read the [from-scratch guide](INTERVIEW_GUIDE.md).
+
 Each run creates fresh demo jobs and checks the result. Use `--quick` to skip the running-job
 cancellation step. The full demo usually waits a few seconds for retry and cancellation. If the
 command fails, check `docker compose ps` and `docker compose logs worker api`.

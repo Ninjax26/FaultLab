@@ -8,13 +8,20 @@ visible. A FastAPI control plane accepts jobs; independent Python or Go worker p
 execute, retry, cancel, and recover them. This is a portfolio-grade systems project and a local
 engineering lab, **not** a hosted multi-tenant production service.
 
+**New to background jobs?** Start with the [from-scratch project and interview guide](docs/INTERVIEW_GUIDE.md).
+**Want to see it work?** Open the [local job console](http://localhost:8000/dashboard) after
+starting the stack, or follow the [five-minute showcase](docs/SHOWCASE.md).
+
 ```text
-HTTP client -> FastAPI -> PostgreSQL jobs + attempts + business effects
-                              ^
-                              | short transactions, FOR UPDATE SKIP LOCKED
-                       Python workers / Go workers
-                              |
-                         registered handlers
+Browser console / HTTP client
+             |
+             v
+          FastAPI ----> PostgreSQL jobs + attempts + business effects
+                               ^
+                               | short transactions, FOR UPDATE SKIP LOCKED
+                        Python workers / Go workers
+                               |
+                          registered handlers
 ```
 
 ## What is implemented
@@ -30,6 +37,8 @@ HTTP client -> FastAPI -> PostgreSQL jobs + attempts + business effects
 - Python and Go workers that share the same job/attempt schema and lease protocol.
 - FastAPI status, cancellation, and attempt-history endpoints, Prometheus metrics, optional OTLP
   tracing, Alembic migrations, Docker Compose, unit/integration tests, and GitHub Actions CI.
+- A local operations console for creating safe demo jobs and inspecting recent status,
+  payloads, results, leases, cancellation, and per-attempt history.
 - Submit-time validation so only registered handler kinds enter the queue.
 - Reproducible claim, end-to-end pipeline, and cross-runtime benchmarks under `reports/`.
 
@@ -66,10 +75,22 @@ Requirements: Docker Compose. For local Python commands, Python 3.12 and
 
 ```bash
 cp .env.example .env
-docker compose up --build
+docker compose up --build -d --wait
 ```
 
-Open [API docs](http://localhost:8000/docs) or [Prometheus](http://localhost:9090).
+If another application already uses host port 5432, start Compose with
+`FAULTLAB_POSTGRES_PORT=55434 docker compose up --build -d --wait` instead.
+The API and worker still talk to PostgreSQL inside the Compose network.
+If you run a Python or Go worker outside Compose, use the matching host port in its database URL.
+
+Open the [job console](http://localhost:8000/dashboard),
+[API docs](http://localhost:8000/docs), or [Prometheus](http://localhost:9090).
+In the console, create a **Flaky** job and select it to watch a failed attempt become a
+successful retry. Create a **Sleep** job to try running-job cancellation. The console shows
+only the latest 200 jobs; its counts are not lifetime totals. It talks to the same API that
+any external client would use. It is plain HTML, CSS, and JavaScript served by FastAPI, with no
+separate frontend build step. **Do not expose the console or API publicly** without adding
+authentication and other production controls.
 
 For a self-checking walkthrough of retries, idempotency, cancellation, and the visible job
 history, run `uv sync --no-editable` and then
@@ -112,6 +133,8 @@ go build -o faultlab-go-worker .
 ```
 
 The Python and Go workers can run together. Use a unique worker ID for each Go process.
+When you finish the demo, use `docker compose down` to stop its containers without deleting
+the named PostgreSQL data volume.
 
 ## Verify and reproduce
 
@@ -129,6 +152,7 @@ port 55433. Its data directory is tmpfs. The tests refuse a URL that does not co
 The benchmark scripts also enforce that guard. Do not run these against real data.
 
 Read the [learning path](docs/LEARNING_PATH.md),
+[from-scratch interview guide](docs/INTERVIEW_GUIDE.md),
 [architecture/invariants](docs/ARCHITECTURE.md),
 [Stage 1 method](docs/STAGE1_CONCURRENCY.md), and
 [benchmark method and limits](docs/BENCHMARKS.md).
