@@ -2,6 +2,8 @@
 
 This guide is for someone who knows basic Python and HTTP but is new to distributed systems.
 The goal is to understand the project well enough to explain it without reading a script.
+For exact implementation invariants, continue to the [engineering handbook](../ENGINEERING_HANDBOOK.md).
+For self-review or AI-generated change review, use the [review guide](REVIEW_GUIDE.md).
 
 ## 1. The problem
 

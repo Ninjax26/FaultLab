@@ -11,6 +11,8 @@ engineering lab, **not** a hosted multi-tenant production service.
 **New to background jobs?** Start with the [from-scratch project and interview guide](docs/INTERVIEW_GUIDE.md).
 **Want to see it work?** Open the [local job console](http://localhost:8000/dashboard) after
 starting the stack, or follow the [five-minute showcase](docs/SHOWCASE.md).
+**Reviewing the implementation?** Use the [engineering handbook](ENGINEERING_HANDBOOK.md) and
+[change-review guide](docs/REVIEW_GUIDE.md).
 
 ```text
 Browser console / HTTP client
@@ -153,6 +155,8 @@ The benchmark scripts also enforce that guard. Do not run these against real dat
 
 Read the [learning path](docs/LEARNING_PATH.md),
 [from-scratch interview guide](docs/INTERVIEW_GUIDE.md),
+[engineering handbook](ENGINEERING_HANDBOOK.md),
+[implementation review guide](docs/REVIEW_GUIDE.md),
 [architecture/invariants](docs/ARCHITECTURE.md),
 [Stage 1 method](docs/STAGE1_CONCURRENCY.md), and
 [benchmark method and limits](docs/BENCHMARKS.md).
