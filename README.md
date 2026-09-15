@@ -14,6 +14,21 @@ starting the stack, or follow the [five-minute showcase](docs/SHOWCASE.md).
 **Reviewing the implementation?** Use the [engineering handbook](ENGINEERING_HANDBOOK.md) and
 [change-review guide](docs/REVIEW_GUIDE.md).
 
+## Deploy the portfolio demo
+
+The included `render.yaml` provisions a free Render web service and PostgreSQL database in
+Singapore. Because Render does not offer free background workers, the demo web container runs
+the API and one Python worker as separate processes. Use separate API and worker services for a
+paid or production-style deployment.
+
+[Deploy FaultLab on Render](https://dashboard.render.com/blueprint/new?repo=https://github.com/Ninjax26/FaultLab)
+
+After the deployment finishes, open `/dashboard`. The browser asks for HTTP Basic credentials:
+the username is `faultlab`; reveal `FAULTLAB_ACCESS_TOKEN` in the Render service's Environment
+page and use it as the password. `/health/live` and `/health/ready` remain public for platform
+health checks. The free PostgreSQL database expires after 30 days and has no backups, so this is
+a portfolio demo, not a production service.
+
 ```text
 Browser console / HTTP client
              |
@@ -163,9 +178,10 @@ Read the [learning path](docs/LEARNING_PATH.md),
 
 ## Scope and honest limitations
 
-FaultLab executes only trusted registered handlers. It has no authentication, tenant isolation,
-quotas, arbitrary-code sandbox, backup/restore validation, or production deployment. The API
-should not be exposed publicly as-is. `SKIP LOCKED` does not guarantee global fairness, and
+FaultLab executes only trusted registered handlers. Its hosted demo has a single shared HTTP
+Basic password, but it has no user accounts, tenant isolation, quotas, arbitrary-code sandbox,
+or backup/restore validation. Do not treat that demo gate as production identity or authorization.
+`SKIP LOCKED` does not guarantee global fairness, and
 high-throughput claims need a workload-specific index/vacuum review. Cancellation is cooperative.
 The crash-after-external-side-effect problem remains unless that external system supports its
 own idempotency key or is coordinated through an outbox/consumer protocol.

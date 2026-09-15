@@ -14,6 +14,7 @@ COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
 COPY alembic.ini ./
 COPY migrations ./migrations
+COPY scripts/start_render.sh ./scripts/start_render.sh
 
 RUN uv sync --frozen --no-editable --no-dev \
     && useradd --create-home --uid 10001 faultlab \

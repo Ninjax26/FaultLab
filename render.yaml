@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: faultlab
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: sh scripts/start_render.sh
+    healthCheckPath: /health/ready
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: FAULTLAB_ENVIRONMENT
+        value: production
+      - key: FAULTLAB_DATABASE_URL
+        fromDatabase:
+          name: faultlab-postgres
+          property: connectionString
+      - key: FAULTLAB_ACCESS_TOKEN
+        generateValue: true
+      - key: FAULTLAB_DATABASE_POOL_SIZE
+        value: 3
+      - key: FAULTLAB_DATABASE_MAX_OVERFLOW
+        value: 1
+      - key: FAULTLAB_WORKER_METRICS_PORT
+        value: 0
+      - key: FAULTLAB_LOG_LEVEL
+        value: INFO
+
+databases:
+  - name: faultlab-postgres
+    databaseName: faultlab
+    user: faultlab
+    plan: free
+    region: singapore
+    ipAllowList: []
