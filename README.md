@@ -14,6 +14,17 @@ starting the stack, or follow the [five-minute showcase](docs/SHOWCASE.md).
 **Reviewing the implementation?** Use the [engineering handbook](ENGINEERING_HANDBOOK.md) and
 [change-review guide](docs/REVIEW_GUIDE.md).
 
+## See it working
+
+![FaultLab retry inspector showing a failed first attempt and successful retry](artifacts/demo/faultlab-retry-detail.png)
+
+- [Watch the 14-second dashboard demo](artifacts/demo/faultlab-demo.mp4)
+- [Open the full dashboard screenshot](artifacts/demo/faultlab-dashboard.png)
+
+The recording creates a deliberately flaky job, shows it move through the queue, opens its
+two-attempt history, and finishes on the cancelled-job view. Regenerate these artifacts against
+a running local stack with `node scripts/capture_demo.cjs` and Playwright available on `NODE_PATH`.
+
 ## Deploy the portfolio demo
 
 The included `render.yaml` provisions a free Render web service and PostgreSQL database in

@@ -8,7 +8,7 @@ services:
     autoDeploy: true
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    dockerCommand: sh scripts/start_render.sh
+    dockerCommand: sh start_render.sh
     healthCheckPath: /health/ready
     maxShutdownDelaySeconds: 30
     envVars:
